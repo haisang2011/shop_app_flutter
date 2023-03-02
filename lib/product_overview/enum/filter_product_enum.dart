@@ -1,0 +1,4 @@
+enum FilterProductEnum {
+  favorites,
+  all
+}
