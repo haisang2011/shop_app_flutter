@@ -6,7 +6,6 @@ import 'package:second_app/cart/view/cart_screen.dart';
 import 'package:second_app/models/product.dart';
 import 'package:second_app/product_overview/bloc/product_overview_bloc.dart';
 import 'package:second_app/product_overview/bloc/product_overview_event.dart';
-import 'package:second_app/product_overview/bloc/product_overview_provider.dart';
 import 'package:second_app/product_overview/bloc/product_overview_state.dart';
 import 'package:second_app/product_overview/enum/filter_product_enum.dart';
 import 'package:second_app/widgets/product_item.dart';
@@ -25,6 +24,13 @@ class ProductOverviewScreen extends StatelessWidget {
     context
         .read<ProductOverviewBloc>()
         .add(AddCartEvent(productId: productId, title: title, price: price));
+
+    Future.delayed(const Duration(milliseconds: 250), () => ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Add $title into cart success', style: const TextStyle(fontSize: 17),),
+        backgroundColor: const Color(0xff54B435),
+      )
+    ));
   }
 
   _onFilter(BuildContext context, FilterProductEnum status) {
@@ -35,6 +41,11 @@ class ProductOverviewScreen extends StatelessWidget {
 
   _onNavigateCartScreen(BuildContext context) {
     Navigator.of(context).pushNamed(CartScreen.routeName);
+  }
+
+  _onOpenDrawer(BuildContext context) {
+    print('object');
+    Scaffold.of(context).openDrawer();
   }
 
   List<Product> getProductsByCriteria(
@@ -51,7 +62,7 @@ class ProductOverviewScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contextGlobal) {
     return BlocBuilder<ProductOverviewBloc, ProductOverviewState>(
       builder: (context, state) => Scaffold(
         appBar: AppBar(
@@ -70,7 +81,7 @@ class ProductOverviewScreen extends StatelessWidget {
                     ]),
             Badge(
                 label: Text(state.items.length.toString()),
-                textStyle: TextStyle(),
+                textStyle: const TextStyle(),
                 alignment: AlignmentDirectional.bottomEnd,
                 child: IconButton(
                   icon: const Icon(Icons.shopping_cart),
@@ -78,6 +89,7 @@ class ProductOverviewScreen extends StatelessWidget {
                   alignment: Alignment.bottomCenter,
                 ))
           ],
+          leading: IconButton(onPressed: () => _onOpenDrawer(contextGlobal), icon: const Icon(Icons.menu)),
         ),
         body: BlocBuilder<ProductOverviewBloc, ProductOverviewState>(
           builder: (context, state) {
@@ -116,6 +128,16 @@ class ProductOverviewScreen extends StatelessWidget {
                     ),
                   );
           },
+        ),
+        drawer: Drawer(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextButton(onPressed: () {}, child: const Text('Shop App')),
+                TextButton(onPressed: () {}, child: const Text('Manage Product')),
+              ],
+            ),
+          ),
         ),
       ),
     );

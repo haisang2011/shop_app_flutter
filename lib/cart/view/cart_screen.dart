@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:second_app/models/cart.dart';
 import 'package:second_app/product_overview/bloc/product_overview_bloc.dart';
-import 'package:second_app/product_overview/bloc/product_overview_provider.dart';
 import 'package:second_app/product_overview/bloc/product_overview_state.dart';
 
 class CartScreen extends StatelessWidget {
@@ -19,20 +18,20 @@ class CartScreen extends StatelessWidget {
         children: [
           Text(
             item.title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
           ),
           const SizedBox(
             width: 6,
           ),
           Text(' x ${item.quantity} :',
               style:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white)),
           const SizedBox(
             width: 8,
           ),
           Text('${item.price}\$',
               style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white)),
         ],
       ),
     );
@@ -44,7 +43,7 @@ class CartScreen extends StatelessWidget {
     TextStyle totalCardStyle = TextStyle(
         color: themeData.primaryColor,
         fontSize: 20,
-        fontWeight: FontWeight.w500);
+        fontWeight: FontWeight.w600);
 
     return Scaffold(
       appBar: AppBar(
@@ -65,9 +64,20 @@ class CartScreen extends StatelessWidget {
                       'Total: ',
                       style: totalCardStyle,
                     ),
-                    Text(
-                      '500',
-                      style: totalCardStyle,
+                    BlocBuilder<ProductOverviewBloc, ProductOverviewState>(
+                      builder: (context, state) {
+                        // Calculate total price
+                        final total = state.items.entries.fold<double>(
+                          0, 
+                          (previousValue, element) => 
+                            previousValue + (element.value.quantity * element.value.price)
+                        );
+
+                        return Text(
+                        '$total\$',
+                        style: totalCardStyle,
+                      );
+                      },
                     )
                   ],
                 ),
@@ -77,7 +87,7 @@ class CartScreen extends StatelessWidget {
               builder: (context, state) {
                 inspect(state);
                 return Card(
-                  color: Colors.amber,
+                  color: themeData.primaryColor,
                   elevation: 3,
                   child: Column(
                     children: [
